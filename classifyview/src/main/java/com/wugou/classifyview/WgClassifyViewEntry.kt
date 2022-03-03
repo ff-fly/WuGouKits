@@ -2,32 +2,61 @@ package com.wugou.classifyview
 
 import android.util.Log
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
-import android.widget.FrameLayout
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import androidx.viewpager2.widget.ViewPager2
+import com.wugou.classifyview.adapter.ClassifyPagerAdapter
 import com.wugou.classifyview.adapter.ClassifyRecyclerAdapter
+import com.wugou.classifyview.adapter.ListItemClickListener
 import com.wugou.classifyview.entity.ClassifyItem
 
-class WgClassifyViewEntry(private val parent: ViewGroup) : IWgClassifyViewEntry {
+class WgClassifyViewEntry(parent: ViewGroup) : IWgClassifyViewEntry {
     companion object {
         private const val TAG = "WgClassifyViewEntry"
     }
 
     private val recyclerView: RecyclerView
-    private val containerView: FrameLayout
+    private val contentViewPager: ViewPager2
+
+    private val listAdapter = ClassifyRecyclerAdapter(parent.context)
+    private val pageAdapter = ClassifyPagerAdapter()
+
+    private var showViewListener: ShowViewListener? = null
+
+    private val contentViewMap = HashMap<Int, View>()
     private val classifyItemList = ArrayList<ClassifyItem>()
-    private val classifyAdapter = ClassifyRecyclerAdapter()
+    private var currentPos = 0
 
     init {
         val root = LayoutInflater.from(parent.context).inflate(R.layout.layout_classify_container, parent)
         recyclerView = root.findViewById(R.id.rc_classify)
-        containerView = root.findViewById(R.id.fl_content_container)
+        contentViewPager = root.findViewById(R.id.vp_content_container)
 
         recyclerView.layoutManager = LinearLayoutManager(parent.context, LinearLayoutManager.VERTICAL, false)
-        recyclerView.addItemDecoration(DividerItemDecoration(parent.context, DividerItemDecoration.HORIZONTAL))
-        recyclerView.adapter = classifyAdapter
+        recyclerView.addItemDecoration(DividerItemDecoration(parent.context, DividerItemDecoration.VERTICAL))
+        recyclerView.adapter = listAdapter
+        listAdapter.setItemClickListener(object : ListItemClickListener {
+            override fun onItemClick(pos: Int) {
+                Log.i(TAG, "onItemClick:$pos")
+                currentPos = pos
+                showViewListener?.getContentView(pos)?.let { contentView ->
+                    contentViewMap[pos] = contentView
+                }
+                contentViewPager.currentItem = pos
+            }
+        })
+
+        contentViewPager.adapter = pageAdapter
+        contentViewPager.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
+            override fun onPageSelected(position: Int) {
+                Log.i(TAG, "onPageSelected:$position")
+                currentPos = position
+                listAdapter.setSelected(position)
+            }
+        })
     }
 
     override fun setClassifyList(list: List<ClassifyItem>?) {
@@ -36,7 +65,15 @@ class WgClassifyViewEntry(private val parent: ViewGroup) : IWgClassifyViewEntry 
         list?.let {
             classifyItemList.addAll(it)
         }
-        classifyAdapter.setData(classifyItemList)
-        recyclerView.adapter?.notifyDataSetChanged()
+        listAdapter.setData(classifyItemList)
+        listAdapter.notifyDataSetChanged()
+
+        pageAdapter.setCount(classifyItemList.size)
+        pageAdapter.notifyDataSetChanged()
+    }
+
+    override fun setShowViewListener(listener: ShowViewListener?) {
+        Log.i(TAG, "setShowViewListener:$listener")
+        showViewListener = listener
     }
 }

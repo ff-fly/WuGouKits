@@ -4,4 +4,6 @@ import com.wugou.classifyview.entity.ClassifyItem
 
 interface IWgClassifyViewEntry {
     fun setClassifyList(list: List<ClassifyItem>?)
+
+    fun setShowViewListener(listener: ShowViewListener?)
 }
