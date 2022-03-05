@@ -2,7 +2,6 @@ package com.wugou.classifyview
 
 import android.util.Log
 import android.view.LayoutInflater
-import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -13,7 +12,7 @@ import com.wugou.classifyview.adapter.ClassifyRecyclerAdapter
 import com.wugou.classifyview.adapter.ListItemClickListener
 import com.wugou.classifyview.entity.ClassifyItem
 
-class WgClassifyViewEntry(parent: ViewGroup) : IWgClassifyViewEntry {
+class WgClassifyViewEntry(parent: ViewGroup, listener: ContentViewListener?) : IWgClassifyViewEntry {
     companion object {
         private const val TAG = "WgClassifyViewEntry"
     }
@@ -22,11 +21,8 @@ class WgClassifyViewEntry(parent: ViewGroup) : IWgClassifyViewEntry {
     private val contentViewPager: ViewPager2
 
     private val listAdapter = ClassifyRecyclerAdapter(parent.context)
-    private val pageAdapter = ClassifyPagerAdapter()
+    private val pageAdapter = ClassifyPagerAdapter(listener)
 
-    private var showViewListener: ShowViewListener? = null
-
-    private val contentViewMap = HashMap<Int, View>()
     private val classifyItemList = ArrayList<ClassifyItem>()
     private var currentPos = 0
 
@@ -42,9 +38,6 @@ class WgClassifyViewEntry(parent: ViewGroup) : IWgClassifyViewEntry {
             override fun onItemClick(pos: Int) {
                 Log.i(TAG, "onItemClick:$pos")
                 currentPos = pos
-                showViewListener?.getContentView(pos)?.let { contentView ->
-                    contentViewMap[pos] = contentView
-                }
                 contentViewPager.currentItem = pos
             }
         })
@@ -70,10 +63,5 @@ class WgClassifyViewEntry(parent: ViewGroup) : IWgClassifyViewEntry {
 
         pageAdapter.setCount(classifyItemList.size)
         pageAdapter.notifyDataSetChanged()
-    }
-
-    override fun setShowViewListener(listener: ShowViewListener?) {
-        Log.i(TAG, "setShowViewListener:$listener")
-        showViewListener = listener
     }
 }

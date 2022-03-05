@@ -17,7 +17,7 @@
             </intent-filter>
         </activity>
 
-        <activity android:name=".ClassifyActivity" />
+        <activity android:name=".classifydemo.ClassifyActivity" />
     </application>
 
 </manifest>
