@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <declare-styleable name="WgClassifyView">
+        <attr name="selected_item_text_color" format="color" />
+        <attr name="selected_item_bg_color" format="color" />
+        <attr name="normal_item_bg_color" format="color" />
+        <attr name="normal_item_text_color" format="color" />
+        <attr name="item_height_dp" format="dimension" />
+        <attr name="normal_text_sp" format="dimension" />
+        <attr name="selected_text_sp" format="dimension" />
+    </declare-styleable>
+</resources>

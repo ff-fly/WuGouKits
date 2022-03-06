@@ -1,13 +1,12 @@
 package com.wugou.utils
 
 import android.content.Context
+import android.util.TypedValue
 
 fun dp2px(context: Context, dpValue: Float): Float {
-    val scale = context.resources.displayMetrics.density
-    return dpValue * scale + 0.5f
+    return TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, dpValue, context.resources.displayMetrics);
 }
 
 fun sp2px(context: Context, spValue: Float): Float {
-    val fontScale = context.resources.displayMetrics.scaledDensity
-    return spValue * fontScale + 0.5f
+    return TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, spValue, context.resources.displayMetrics);
 }
