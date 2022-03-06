@@ -52,9 +52,6 @@ class ClassifyRecyclerAdapter(private val context: Context) : RecyclerView.Adapt
     override fun onBindViewHolder(holder: ClassifyViewHolder, position: Int) {
         val data = dataList[position]
         holder.itemTextView.text = data.itemName
-        data.itemIcon?.let {
-            holder.itemTextView.setCompoundDrawables(it, null, null, null)
-        }
         holder.itemView.tag = position
         holder.itemView.setOnClickListener(this)
         if (position == selectedPos) {
