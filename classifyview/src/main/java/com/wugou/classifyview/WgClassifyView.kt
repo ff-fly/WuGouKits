@@ -1,8 +1,10 @@
 package com.wugou.classifyview
 
+import android.content.Context
+import android.util.AttributeSet
 import android.util.Log
 import android.view.LayoutInflater
-import android.view.ViewGroup
+import android.widget.RelativeLayout
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -12,7 +14,7 @@ import com.wugou.classifyview.adapter.ClassifyRecyclerAdapter
 import com.wugou.classifyview.adapter.ListItemClickListener
 import com.wugou.classifyview.entity.ClassifyItem
 
-class WgClassifyViewEntry(parent: ViewGroup, listener: ContentViewListener?) : IWgClassifyViewEntry {
+class WgClassifyView : RelativeLayout, IWgClassifyView {
     companion object {
         private const val TAG = "WgClassifyViewEntry"
     }
@@ -20,19 +22,23 @@ class WgClassifyViewEntry(parent: ViewGroup, listener: ContentViewListener?) : I
     private val recyclerView: RecyclerView
     private val contentViewPager: ViewPager2
 
-    private val listAdapter = ClassifyRecyclerAdapter(parent.context)
-    private val pageAdapter = ClassifyPagerAdapter(listener)
+    private val listAdapter = ClassifyRecyclerAdapter(context)
+    private val pageAdapter = ClassifyPagerAdapter()
 
     private val classifyItemList = ArrayList<ClassifyItem>()
     private var currentPos = 0
 
+    constructor(context: Context?) : super(context)
+    constructor(context: Context?, attrs: AttributeSet?) : super(context, attrs)
+    constructor(context: Context?, attrs: AttributeSet?, defStyleAttr: Int) : super(context, attrs, defStyleAttr)
+
     init {
-        val root = LayoutInflater.from(parent.context).inflate(R.layout.layout_classify_container, parent)
+        val root = LayoutInflater.from(context).inflate(R.layout.layout_classify_container, this)
         recyclerView = root.findViewById(R.id.rc_classify)
         contentViewPager = root.findViewById(R.id.vp_content_container)
 
-        recyclerView.layoutManager = LinearLayoutManager(parent.context, LinearLayoutManager.VERTICAL, false)
-        recyclerView.addItemDecoration(DividerItemDecoration(parent.context, DividerItemDecoration.VERTICAL))
+        recyclerView.layoutManager = LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)
+        recyclerView.addItemDecoration(DividerItemDecoration(context, DividerItemDecoration.VERTICAL))
         recyclerView.adapter = listAdapter
         listAdapter.setItemClickListener(object : ListItemClickListener {
             override fun onItemClick(pos: Int) {
@@ -52,6 +58,11 @@ class WgClassifyViewEntry(parent: ViewGroup, listener: ContentViewListener?) : I
         })
     }
 
+    override fun setContentViewListener(listener: ContentViewListener?) {
+        Log.i(TAG, "setContentViewListener:$listener")
+        pageAdapter.listener = listener
+    }
+
     override fun setClassifyList(list: List<ClassifyItem>?) {
         Log.i(TAG, "setClassifyList:$list")
         classifyItemList.clear()
@@ -61,7 +72,7 @@ class WgClassifyViewEntry(parent: ViewGroup, listener: ContentViewListener?) : I
         listAdapter.setData(classifyItemList)
         listAdapter.notifyDataSetChanged()
 
-        pageAdapter.setCount(classifyItemList.size)
+        pageAdapter.itemSize = classifyItemList.size
         pageAdapter.notifyDataSetChanged()
     }
 }

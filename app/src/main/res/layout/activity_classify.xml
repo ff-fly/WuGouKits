@@ -3,8 +3,8 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <FrameLayout
-        android:id="@+id/fl_classify_root"
+    <com.wugou.classifyview.WgClassifyView
+        android:id="@+id/wg_classify_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
 

@@ -9,29 +9,33 @@ import com.wugou.classifyview.ContentViewListener
 import com.wugou.classifyview.R
 
 
-class ClassifyPagerAdapter(private val listener: ContentViewListener?) : RecyclerView.Adapter<ClassifyPagerAdapter.ClassifyViewHolder>() {
+class ClassifyPagerAdapter : RecyclerView.Adapter<ClassifyPagerAdapter.ClassifyViewHolder>() {
     companion object {
         private const val TAG = "ClassifyPagerAdapter"
     }
 
-    private var count = 0
-    private val resId = listener?.getContentViewResId()
+    var listener: ContentViewListener? = null
+        set(value) {
+            Log.i(TAG, "set listener:$value")
+            field = value
+        }
 
-    fun setCount(count: Int) {
-        Log.i(TAG, "setCount:$count")
-        this.count = count
-    }
+    var itemSize = 0
+        set(value) {
+            Log.i(TAG, "setSize:$value")
+            field = value
+        }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ClassifyViewHolder {
         val itemView = LayoutInflater.from(parent.context).inflate(R.layout.layout_content_item, parent, false)
-        resId?.let { it ->
+        listener?.getContentViewResId()?.let { it ->
             LayoutInflater.from(parent.context).inflate(it, itemView as ViewGroup?)
         }
         return ClassifyViewHolder(itemView, listener)
     }
 
     override fun getItemCount(): Int {
-        return count
+        return itemSize
     }
 
     override fun onBindViewHolder(holder: ClassifyViewHolder, position: Int) {

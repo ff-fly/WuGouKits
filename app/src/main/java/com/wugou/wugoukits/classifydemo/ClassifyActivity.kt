@@ -5,8 +5,7 @@ import android.util.Log
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import com.wugou.classifyview.ContentViewListener
-import com.wugou.classifyview.IWgClassifyViewEntry
-import com.wugou.classifyview.WgClassifyViewEntry
+import com.wugou.classifyview.WgClassifyView
 import com.wugou.classifyview.entity.ClassifyItem
 import com.wugou.wugoukits.R
 
@@ -19,7 +18,8 @@ class ClassifyActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_classify)
 
-        val classifyEntry: IWgClassifyViewEntry = WgClassifyViewEntry(findViewById(R.id.fl_classify_root), object : ContentViewListener {
+        val wgClassifyView = findViewById<WgClassifyView>(R.id.wg_classify_view)
+        wgClassifyView.setContentViewListener(object : ContentViewListener {
             override fun getContentViewResId(): Int {
                 return R.layout.layout_vp_content
             }
@@ -39,6 +39,6 @@ class ClassifyActivity : AppCompatActivity() {
         list.add(ClassifyItem("周五"))
         list.add(ClassifyItem("周六"))
         list.add(ClassifyItem("周日"))
-        classifyEntry.setClassifyList(list)
+        wgClassifyView.setClassifyList(list)
     }
 }
