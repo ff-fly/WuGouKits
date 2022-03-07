@@ -8,5 +8,7 @@
         <attr name="item_height_dp" format="dimension" />
         <attr name="normal_text_sp" format="dimension" />
         <attr name="selected_text_sp" format="dimension" />
+        <attr name="selected_item_corner" format="dimension" />
+        <attr name="list_item_width" format="dimension" />
     </declare-styleable>
 </resources>

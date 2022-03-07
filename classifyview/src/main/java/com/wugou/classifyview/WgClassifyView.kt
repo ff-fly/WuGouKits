@@ -13,10 +13,12 @@ import com.wugou.classifyview.adapter.ClassifyRecyclerAdapter
 import com.wugou.classifyview.adapter.ListItemClickListener
 import com.wugou.classifyview.entity.ClassifyItem
 import com.wugou.classifyview.entity.DEF_ITEM_HEIGHT_DP
+import com.wugou.classifyview.entity.DEF_ITEM_WIDTH_DP
 import com.wugou.classifyview.entity.DEF_NORMAL_BG_COLOR
 import com.wugou.classifyview.entity.DEF_NORMAL_TEXT_COLOR
 import com.wugou.classifyview.entity.DEF_NORMAL_TEXT_SP
 import com.wugou.classifyview.entity.DEF_SELECTED_BG_COLOR
+import com.wugou.classifyview.entity.DEF_SELECTED_CORNER_DP
 import com.wugou.classifyview.entity.DEF_SELECTED_TEXT_COLOR
 import com.wugou.classifyview.entity.DEF_SELECT_TEXT_SP
 import com.wugou.utils.dp2px
@@ -86,17 +88,21 @@ class WgClassifyView : RelativeLayout, IWgClassifyView {
     private fun setItemUiConfigs(context: Context?, attrs: AttributeSet?) {
         if (context == null) return
         val ta = context.obtainStyledAttributes(attrs, R.styleable.WgClassifyView)
-        val defaultHeightPix = dp2px(context, DEF_ITEM_HEIGHT_DP.toFloat()).toInt()
-        val heightPix = ta.getDimensionPixelSize(R.styleable.WgClassifyView_item_height_dp, defaultHeightPix)
+        val heightPix = ta.getDimensionPixelSize(R.styleable.WgClassifyView_item_height_dp, dp2px(context, DEF_ITEM_HEIGHT_DP.toFloat()).toInt())
         val normalItemTextColor = ta.getColor(R.styleable.WgClassifyView_normal_item_text_color, DEF_NORMAL_TEXT_COLOR)
         val selectedItemTextColor = ta.getColor(R.styleable.WgClassifyView_selected_item_text_color, DEF_SELECTED_TEXT_COLOR)
         val normalItemBgColor = ta.getColor(R.styleable.WgClassifyView_normal_item_bg_color, DEF_NORMAL_BG_COLOR)
         val selectedItemBgColor = ta.getColor(R.styleable.WgClassifyView_selected_item_bg_color, DEF_SELECTED_BG_COLOR)
         val normalTextPix = ta.getDimensionPixelSize(R.styleable.WgClassifyView_normal_text_sp, DEF_NORMAL_TEXT_SP)
         val selectedTextPix = ta.getDimensionPixelSize(R.styleable.WgClassifyView_selected_text_sp, DEF_SELECT_TEXT_SP)
+        val selectedCorner = ta.getDimension(R.styleable.WgClassifyView_selected_item_corner, dp2px(context, DEF_SELECTED_CORNER_DP.toFloat()))
+        val defaultItemWidth = ta.getDimensionPixelSize(R.styleable.WgClassifyView_list_item_width, dp2px(context, DEF_ITEM_WIDTH_DP.toFloat()).toInt())
         ta.recycle()
 
+        val params = recyclerView.layoutParams
+        params.width = defaultItemWidth
+        recyclerView.layoutParams = params
         listAdapter.setConfigs(heightPix, normalItemTextColor, selectedItemTextColor,
-                normalItemBgColor, selectedItemBgColor, normalTextPix, selectedTextPix)
+                normalItemBgColor, selectedItemBgColor, normalTextPix, selectedTextPix, selectedCorner)
     }
 }

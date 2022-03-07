@@ -1,6 +1,8 @@
 package com.wugou.classifyview.adapter
 
 import android.content.Context
+import android.graphics.drawable.GradientDrawable
+import android.graphics.drawable.GradientDrawable.RECTANGLE
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -14,6 +16,7 @@ import com.wugou.classifyview.entity.DEF_NORMAL_BG_COLOR
 import com.wugou.classifyview.entity.DEF_NORMAL_TEXT_COLOR
 import com.wugou.classifyview.entity.DEF_NORMAL_TEXT_SP
 import com.wugou.classifyview.entity.DEF_SELECTED_BG_COLOR
+import com.wugou.classifyview.entity.DEF_SELECTED_CORNER_DP
 import com.wugou.classifyview.entity.DEF_SELECTED_TEXT_COLOR
 import com.wugou.classifyview.entity.DEF_SELECT_TEXT_SP
 import com.wugou.utils.dp2px
@@ -33,13 +36,15 @@ class ClassifyRecyclerAdapter(private val context: Context) : RecyclerView.Adapt
     private var selectedTextColor = DEF_SELECTED_TEXT_COLOR
     private var selectedBgColor = DEF_SELECTED_BG_COLOR
     private var heightPix = dp2px(context, DEF_ITEM_HEIGHT_DP.toFloat()).toInt()
+    private var selectedCornerPix = dp2px(context, DEF_SELECTED_CORNER_DP.toFloat())
 
     private var dataList = ArrayList<ClassifyItem>()
     private var itemClickListener: ListItemClickListener? = null
     private var selectedPos = 0
 
     fun setConfigs(heightPix: Int, normalTextColor: Int, selectedTextColor: Int,
-                   normalBgColor: Int, selectedBgColor: Int, normalTextPix: Int, selectedTextPix: Int) {
+                   normalBgColor: Int, selectedBgColor: Int, normalTextPix: Int,
+                   selectedTextPix: Int, selectedCorner: Float) {
         this.heightPix = heightPix
         this.normalTextColor = normalTextColor
         this.selectedTextColor = selectedTextColor
@@ -47,6 +52,7 @@ class ClassifyRecyclerAdapter(private val context: Context) : RecyclerView.Adapt
         this.selectedBgColor = selectedBgColor
         this.normalTextPix = normalTextPix
         this.selectedTextPix = selectedTextPix
+        this.selectedCornerPix = selectedCorner
     }
 
     fun setData(list: List<ClassifyItem>) {
@@ -57,9 +63,8 @@ class ClassifyRecyclerAdapter(private val context: Context) : RecyclerView.Adapt
     fun setSelected(pos: Int) {
         Log.i(TAG, "setSelected pos:$pos, itemCount:$itemCount")
         if (pos in 0 until itemCount) {
-            notifyItemChanged(selectedPos)
             selectedPos = pos
-            notifyItemChanged(pos)
+            notifyDataSetChanged()
         }
     }
 
@@ -84,14 +89,21 @@ class ClassifyRecyclerAdapter(private val context: Context) : RecyclerView.Adapt
         holder.itemTextView.text = data.itemName
         holder.itemView.tag = position
         holder.itemView.setOnClickListener(this)
-        if (position == selectedPos) {
-            holder.itemView.setBackgroundColor(selectedBgColor)
-            holder.itemTextView.setTextColor(selectedTextColor)
-            holder.itemTextView.textSize = selectedTextPix.toFloat()
-        } else {
-            holder.itemView.setBackgroundColor(normalBgColor)
-            holder.itemTextView.setTextColor(normalTextColor)
-            holder.itemTextView.textSize = normalTextPix.toFloat()
+        when (position) {
+            selectedPos -> {
+                holder.itemView.setBackgroundColor(selectedBgColor)
+                holder.itemTextView.setTextColor(selectedTextColor)
+                holder.itemTextView.textSize = selectedTextPix.toFloat()
+            }
+            selectedPos - 1 -> {
+                setNormalItemStyle(position, selectedCornerPix.toInt(), holder)
+            }
+            selectedPos + 1 -> {
+                setNormalItemStyle(position, selectedCornerPix.toInt(), holder)
+            }
+            else -> {
+                setNormalItemStyle(position, 0, holder)
+            }
         }
     }
 
@@ -100,6 +112,32 @@ class ClassifyRecyclerAdapter(private val context: Context) : RecyclerView.Adapt
             setSelected(pos as Int)
             itemClickListener?.onItemClick(pos)
         }
+    }
+
+    private fun setNormalItemStyle(position: Int, corner: Int, holder: ClassifyViewHolder) {
+        var posPair: Pair<Int, Int>? = null
+        if (corner > 0) {
+            if (position == selectedPos - 1) {
+                posPair = Pair(4, 5)
+            }
+            if (position == selectedPos + 1) {
+                posPair = Pair(2, 3)
+            }
+        }
+
+        posPair?.apply {
+            val drawable = GradientDrawable()
+            drawable.shape = RECTANGLE
+            drawable.setColor(normalBgColor)
+            drawable.cornerRadii = FloatArray(8).apply {
+                set(first, selectedCornerPix)
+                set(second, selectedCornerPix)
+            }
+            holder.itemView.background = drawable
+        } ?: holder.itemView.setBackgroundColor(normalBgColor)
+
+        holder.itemTextView.setTextColor(normalTextColor)
+        holder.itemTextView.textSize = normalTextPix.toFloat()
     }
 
     class ClassifyViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
