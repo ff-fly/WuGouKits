@@ -1,6 +1,7 @@
 package com.wugou.classifyview
 
 import android.content.Context
+import android.graphics.drawable.Drawable
 import android.util.AttributeSet
 import android.util.Log
 import android.view.LayoutInflater
@@ -19,6 +20,9 @@ import com.wugou.classifyview.entity.DEF_NORMAL_TEXT_COLOR
 import com.wugou.classifyview.entity.DEF_NORMAL_TEXT_SP
 import com.wugou.classifyview.entity.DEF_SELECTED_BG_COLOR
 import com.wugou.classifyview.entity.DEF_SELECTED_CORNER_DP
+import com.wugou.classifyview.entity.DEF_SELECTED_ICON_MARGIN_LEFT_DP
+import com.wugou.classifyview.entity.DEF_SELECTED_ICON_MARGIN_RIGHT_DP
+import com.wugou.classifyview.entity.DEF_SELECTED_ICON_SIZE_DP
 import com.wugou.classifyview.entity.DEF_SELECTED_TEXT_COLOR
 import com.wugou.classifyview.entity.DEF_SELECT_TEXT_SP
 import com.wugou.utils.dp2px
@@ -72,6 +76,11 @@ class WgClassifyView : RelativeLayout, IWgClassifyView {
         pageAdapter.listener = listener
     }
 
+    override fun setSelectedDrawable(drawable: Drawable?) {
+        Log.i(TAG, "setSelectedDrawable:$drawable")
+        listAdapter.setSelectedDrawable(drawable)
+    }
+
     override fun setClassifyList(list: List<ClassifyItem>?) {
         Log.i(TAG, "setClassifyList:$list")
         classifyItemList.clear()
@@ -97,12 +106,16 @@ class WgClassifyView : RelativeLayout, IWgClassifyView {
         val selectedTextPix = ta.getDimensionPixelSize(R.styleable.WgClassifyView_selected_text_sp, DEF_SELECT_TEXT_SP)
         val selectedCorner = ta.getDimension(R.styleable.WgClassifyView_selected_item_corner, dp2px(context, DEF_SELECTED_CORNER_DP.toFloat()))
         val defaultItemWidth = ta.getDimensionPixelSize(R.styleable.WgClassifyView_list_item_width, dp2px(context, DEF_ITEM_WIDTH_DP.toFloat()).toInt())
+        val selectedIconSizePix = ta.getDimensionPixelSize(R.styleable.WgClassifyView_selected_icon_size, dp2px(context, DEF_SELECTED_ICON_SIZE_DP.toFloat()).toInt())
+        val selectedIconMarginLeftPix = ta.getDimensionPixelSize(R.styleable.WgClassifyView_selected_icon_margin_left, dp2px(context, DEF_SELECTED_ICON_MARGIN_LEFT_DP.toFloat()).toInt())
+        val selectedIconMarginRightPix = ta.getDimensionPixelSize(R.styleable.WgClassifyView_selected_icon_margin_right, dp2px(context, DEF_SELECTED_ICON_MARGIN_RIGHT_DP.toFloat()).toInt())
         ta.recycle()
 
         val params = recyclerView.layoutParams
         params.width = defaultItemWidth
         recyclerView.layoutParams = params
         listAdapter.setConfigs(heightPix, normalItemTextColor, selectedItemTextColor,
-                normalItemBgColor, selectedItemBgColor, normalTextPix, selectedTextPix, selectedCorner)
+                normalItemBgColor, selectedItemBgColor, normalTextPix, selectedTextPix, selectedCorner,
+                selectedIconSizePix, selectedIconMarginLeftPix, selectedIconMarginRightPix)
     }
 }

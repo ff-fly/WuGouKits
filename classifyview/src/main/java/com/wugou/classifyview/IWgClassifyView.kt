@@ -1,5 +1,6 @@
 package com.wugou.classifyview
 
+import android.graphics.drawable.Drawable
 import com.wugou.classifyview.entity.ClassifyItem
 
 interface IWgClassifyView {
@@ -12,4 +13,9 @@ interface IWgClassifyView {
      * 在setClassifyList之前调用
      */
     fun setContentViewListener(listener: ContentViewListener?)
+
+    /**
+     * 设置当前选中item左侧的drawable
+     */
+    fun setSelectedDrawable(drawable: Drawable?)
 }

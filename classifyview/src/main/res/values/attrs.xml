@@ -10,5 +10,8 @@
         <attr name="selected_text_sp" format="dimension" />
         <attr name="selected_item_corner" format="dimension" />
         <attr name="list_item_width" format="dimension" />
+        <attr name="selected_icon_size" format="dimension" />
+        <attr name="selected_icon_margin_left" format="dimension" />
+        <attr name="selected_icon_margin_right" format="dimension" />
     </declare-styleable>
 </resources>

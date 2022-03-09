@@ -31,6 +31,8 @@ class ClassifyActivity : AppCompatActivity() {
                 }
             }
         })
+        val drawable = resources.getDrawable(R.drawable.ic_ball)
+        wgClassifyView.setSelectedDrawable(drawable)
         val list = mutableListOf<ClassifyItem>()
         list.add(ClassifyItem("周一"))
         list.add(ClassifyItem("周二"))

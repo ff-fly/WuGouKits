@@ -1,12 +1,14 @@
 package com.wugou.classifyview.adapter
 
 import android.content.Context
+import android.graphics.drawable.Drawable
 import android.graphics.drawable.GradientDrawable
 import android.graphics.drawable.GradientDrawable.RECTANGLE
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.wugou.classifyview.R
@@ -17,6 +19,9 @@ import com.wugou.classifyview.entity.DEF_NORMAL_TEXT_COLOR
 import com.wugou.classifyview.entity.DEF_NORMAL_TEXT_SP
 import com.wugou.classifyview.entity.DEF_SELECTED_BG_COLOR
 import com.wugou.classifyview.entity.DEF_SELECTED_CORNER_DP
+import com.wugou.classifyview.entity.DEF_SELECTED_ICON_MARGIN_LEFT_DP
+import com.wugou.classifyview.entity.DEF_SELECTED_ICON_MARGIN_RIGHT_DP
+import com.wugou.classifyview.entity.DEF_SELECTED_ICON_SIZE_DP
 import com.wugou.classifyview.entity.DEF_SELECTED_TEXT_COLOR
 import com.wugou.classifyview.entity.DEF_SELECT_TEXT_SP
 import com.wugou.utils.dp2px
@@ -37,14 +42,19 @@ class ClassifyRecyclerAdapter(private val context: Context) : RecyclerView.Adapt
     private var selectedBgColor = DEF_SELECTED_BG_COLOR
     private var heightPix = dp2px(context, DEF_ITEM_HEIGHT_DP.toFloat()).toInt()
     private var selectedCornerPix = dp2px(context, DEF_SELECTED_CORNER_DP.toFloat())
+    private var selectedIconSizePix = dp2px(context, DEF_SELECTED_ICON_SIZE_DP.toFloat()).toInt()
+    private var selectedIconMarginLeftPix = dp2px(context, DEF_SELECTED_ICON_MARGIN_LEFT_DP.toFloat()).toInt()
+    private var selectedIconMarginRightPix = dp2px(context, DEF_SELECTED_ICON_MARGIN_RIGHT_DP.toFloat()).toInt()
 
     private var dataList = ArrayList<ClassifyItem>()
     private var itemClickListener: ListItemClickListener? = null
     private var selectedPos = 0
+    private var selectedDrawable: Drawable? = null
 
     fun setConfigs(heightPix: Int, normalTextColor: Int, selectedTextColor: Int,
                    normalBgColor: Int, selectedBgColor: Int, normalTextPix: Int,
-                   selectedTextPix: Int, selectedCorner: Float) {
+                   selectedTextPix: Int, selectedCorner: Float, selectedIconSizePix: Int,
+                   selectedIconMarginLeftPix: Int, selectedIconMarginRightPix: Int) {
         this.heightPix = heightPix
         this.normalTextColor = normalTextColor
         this.selectedTextColor = selectedTextColor
@@ -53,6 +63,9 @@ class ClassifyRecyclerAdapter(private val context: Context) : RecyclerView.Adapt
         this.normalTextPix = normalTextPix
         this.selectedTextPix = selectedTextPix
         this.selectedCornerPix = selectedCorner
+        this.selectedIconSizePix = selectedIconSizePix
+        this.selectedIconMarginLeftPix = selectedIconMarginLeftPix
+        this.selectedIconMarginRightPix = selectedIconMarginRightPix
     }
 
     fun setData(list: List<ClassifyItem>) {
@@ -72,12 +85,24 @@ class ClassifyRecyclerAdapter(private val context: Context) : RecyclerView.Adapt
         itemClickListener = listener
     }
 
+    fun setSelectedDrawable(drawable: Drawable?) {
+        selectedDrawable = drawable
+    }
+
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ClassifyViewHolder {
         val itemView = LayoutInflater.from(context).inflate(R.layout.layout_list_item, parent, false)
-        val params = itemView.layoutParams
-        params.height = heightPix
-        itemView.layoutParams = params
-        return ClassifyViewHolder(itemView)
+
+        val itemParams = itemView.layoutParams
+        itemParams.height = heightPix
+        itemView.layoutParams = itemParams
+        val holder = ClassifyViewHolder(itemView)
+
+        val iconParams = holder.selectedIcon.layoutParams as ViewGroup.MarginLayoutParams
+        iconParams.width = selectedIconSizePix
+        iconParams.height = selectedIconSizePix
+        iconParams.leftMargin = selectedIconMarginLeftPix
+        iconParams.rightMargin = selectedIconMarginRightPix
+        return holder
     }
 
     override fun getItemCount(): Int {
@@ -94,6 +119,8 @@ class ClassifyRecyclerAdapter(private val context: Context) : RecyclerView.Adapt
                 holder.itemView.setBackgroundColor(selectedBgColor)
                 holder.itemTextView.setTextColor(selectedTextColor)
                 holder.itemTextView.textSize = selectedTextPix.toFloat()
+                holder.selectedIcon.visibility = View.VISIBLE
+                holder.selectedIcon.setImageDrawable(selectedDrawable)
             }
             selectedPos - 1 -> {
                 setNormalItemStyle(position, selectedCornerPix.toInt(), holder)
@@ -138,9 +165,11 @@ class ClassifyRecyclerAdapter(private val context: Context) : RecyclerView.Adapt
 
         holder.itemTextView.setTextColor(normalTextColor)
         holder.itemTextView.textSize = normalTextPix.toFloat()
+        holder.selectedIcon.visibility = View.INVISIBLE
     }
 
     class ClassifyViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         val itemTextView: TextView = itemView.findViewById(R.id.tv_item_text)
+        val selectedIcon: ImageView = itemView.findViewById(R.id.iv_selected)
     }
 }
