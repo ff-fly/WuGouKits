@@ -25,6 +25,7 @@ import com.wugou.classifyview.entity.DEF_SELECTED_ICON_MARGIN_RIGHT_DP
 import com.wugou.classifyview.entity.DEF_SELECTED_ICON_SIZE_DP
 import com.wugou.classifyview.entity.DEF_SELECTED_TEXT_COLOR
 import com.wugou.classifyview.entity.DEF_SELECT_TEXT_SP
+import com.wugou.classifyview.entity.UiConfigs
 import com.wugou.utils.dp2px
 
 class WgClassifyView : RelativeLayout, IWgClassifyView {
@@ -35,7 +36,7 @@ class WgClassifyView : RelativeLayout, IWgClassifyView {
     private lateinit var recyclerView: RecyclerView
     private lateinit var contentViewPager: ViewPager2
 
-    private val listAdapter = ClassifyRecyclerAdapter(context)
+    private lateinit var listAdapter: ClassifyRecyclerAdapter
     private val pageAdapter = ClassifyPagerAdapter()
 
     private val classifyItemList = ArrayList<ClassifyItem>()
@@ -50,7 +51,7 @@ class WgClassifyView : RelativeLayout, IWgClassifyView {
         recyclerView = root.findViewById(R.id.rc_classify)
         contentViewPager = root.findViewById(R.id.vp_content_container)
 
-        setItemUiConfigs(context, attrs)
+        listAdapter = ClassifyRecyclerAdapter(context, getUiConfigs(context, attrs))
         recyclerView.layoutManager = LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)
         recyclerView.adapter = listAdapter
         listAdapter.setItemClickListener(object : ListItemClickListener {
@@ -94,8 +95,7 @@ class WgClassifyView : RelativeLayout, IWgClassifyView {
         pageAdapter.notifyDataSetChanged()
     }
 
-    private fun setItemUiConfigs(context: Context?, attrs: AttributeSet?) {
-        if (context == null) return
+    private fun getUiConfigs(context: Context, attrs: AttributeSet?): UiConfigs {
         val ta = context.obtainStyledAttributes(attrs, R.styleable.WgClassifyView)
         val heightPix = ta.getDimensionPixelSize(R.styleable.WgClassifyView_item_height_dp, dp2px(context, DEF_ITEM_HEIGHT_DP.toFloat()).toInt())
         val normalItemTextColor = ta.getColor(R.styleable.WgClassifyView_normal_item_text_color, DEF_NORMAL_TEXT_COLOR)
@@ -105,17 +105,18 @@ class WgClassifyView : RelativeLayout, IWgClassifyView {
         val normalTextPix = ta.getDimensionPixelSize(R.styleable.WgClassifyView_normal_text_sp, DEF_NORMAL_TEXT_SP)
         val selectedTextPix = ta.getDimensionPixelSize(R.styleable.WgClassifyView_selected_text_sp, DEF_SELECT_TEXT_SP)
         val selectedCorner = ta.getDimension(R.styleable.WgClassifyView_selected_item_corner, dp2px(context, DEF_SELECTED_CORNER_DP.toFloat()))
-        val defaultItemWidth = ta.getDimensionPixelSize(R.styleable.WgClassifyView_list_item_width, dp2px(context, DEF_ITEM_WIDTH_DP.toFloat()).toInt())
+        val listItemWidth = ta.getDimensionPixelSize(R.styleable.WgClassifyView_list_item_width, dp2px(context, DEF_ITEM_WIDTH_DP.toFloat()).toInt())
         val selectedIconSizePix = ta.getDimensionPixelSize(R.styleable.WgClassifyView_selected_icon_size, dp2px(context, DEF_SELECTED_ICON_SIZE_DP.toFloat()).toInt())
         val selectedIconMarginLeftPix = ta.getDimensionPixelSize(R.styleable.WgClassifyView_selected_icon_margin_left, dp2px(context, DEF_SELECTED_ICON_MARGIN_LEFT_DP.toFloat()).toInt())
         val selectedIconMarginRightPix = ta.getDimensionPixelSize(R.styleable.WgClassifyView_selected_icon_margin_right, dp2px(context, DEF_SELECTED_ICON_MARGIN_RIGHT_DP.toFloat()).toInt())
         ta.recycle()
 
         val params = recyclerView.layoutParams
-        params.width = defaultItemWidth
+        params.width = listItemWidth
         recyclerView.layoutParams = params
-        listAdapter.setConfigs(heightPix, normalItemTextColor, selectedItemTextColor,
-                normalItemBgColor, selectedItemBgColor, normalTextPix, selectedTextPix, selectedCorner,
-                selectedIconSizePix, selectedIconMarginLeftPix, selectedIconMarginRightPix)
+
+        return UiConfigs(heightPix, normalItemTextColor, selectedItemTextColor,
+                normalItemBgColor, selectedItemBgColor, normalTextPix, selectedTextPix,
+                selectedCorner, selectedIconSizePix, selectedIconMarginLeftPix, selectedIconMarginRightPix)
     }
 }
