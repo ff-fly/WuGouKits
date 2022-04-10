@@ -124,7 +124,7 @@ class ClassifyRecyclerAdapter(private val context: Context, private val uiConfig
 
         holder.itemTextView.setTextColor(uiConfigs.normalTextColor)
         holder.itemTextView.textSize = uiConfigs.normalTextPix.toFloat()
-        holder.selectedIcon.visibility = View.INVISIBLE
+        holder.selectedIcon.visibility = View.GONE
     }
 
     class ClassifyViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
