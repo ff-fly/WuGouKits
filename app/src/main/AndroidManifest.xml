@@ -18,6 +18,7 @@
         </activity>
 
         <activity android:name=".classifydemo.ClassifyActivity" />
+        <activity android:name=".datedemo.DateSelectActivity" />
     </application>
 
 </manifest>
