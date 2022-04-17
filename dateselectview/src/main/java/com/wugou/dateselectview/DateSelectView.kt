@@ -2,7 +2,6 @@ package com.wugou.dateselectview
 
 import android.content.Context
 import android.util.AttributeSet
-import android.util.Log
 import android.view.LayoutInflater
 import android.widget.FrameLayout
 import android.widget.TextView
@@ -39,7 +38,10 @@ class DateSelectView : FrameLayout {
     }
 
     fun setYear(year: Int) {
-        Log.i(TAG, "setYear:$year")
         dateAdapter.setYear(year)
+    }
+
+    fun setDate(year: Int, month: Int, day: Int) {
+        dateAdapter.setDate(year, month, day)
     }
 }
