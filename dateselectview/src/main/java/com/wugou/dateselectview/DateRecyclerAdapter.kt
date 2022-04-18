@@ -28,11 +28,14 @@ class DateRecyclerAdapter(private val context: Context) :
 
         curYear = year
         dataList.clear()
-        for (month in 1..12) {
-            val days = getDaysOfMonth(year, month)
-            for (day in 1..days) {
-                dataList.add(day)
-            }
+//        for (month in 1..12) {
+//            val days = getDaysOfMonth(year, month)
+//            for (day in 1..days) {
+//                dataList.add(day)
+//            }
+//        }
+        for (month in 0..100) {
+            dataList.add(month)
         }
         notifyDataSetChanged()
     }
