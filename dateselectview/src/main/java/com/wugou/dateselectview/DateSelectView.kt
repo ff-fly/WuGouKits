@@ -7,7 +7,6 @@ import android.view.LayoutInflater
 import android.widget.FrameLayout
 import android.widget.ImageView
 import android.widget.TextView
-import androidx.core.view.postDelayed
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.SCROLL_STATE_IDLE
@@ -47,6 +46,13 @@ class DateSelectView : FrameLayout {
         dateRecyclerView.adapter = dateAdapter
 
         dateRecyclerView.addOnScrollListener(object : RecyclerView.OnScrollListener() {
+            var isScrollLeft = false
+            override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+                super.onScrolled(recyclerView, dx, dy)
+                Log.i(TAG, "onScrolled dx:$dx, dy:$dy")
+                isScrollLeft = dx > 0
+            }
+
             override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
                 super.onScrollStateChanged(recyclerView, newState)
                 if (newState == SCROLL_STATE_IDLE) {
@@ -54,11 +60,23 @@ class DateSelectView : FrameLayout {
                     lastVisibleItemPos = layoutManager.findLastVisibleItemPosition()
                     val selectorLocationX = selectorView.left
                     val midPos = (firstVisibleItemPos + lastVisibleItemPos) / 2
-                    val itemView =
+                    var itemView =
                         dateRecyclerView.findViewHolderForAdapterPosition(midPos)!!.itemView
                     val itemLocation = IntArray(2)
                     itemView.getLocationOnScreen(itemLocation)
-                    val itemLocationX = itemLocation[0]
+                    var itemLocationX = itemLocation[0]
+                    if (isScrollLeft && itemLocationX < selectorLocationX) {
+                        itemView =
+                            dateRecyclerView.findViewHolderForAdapterPosition(midPos + 1)!!.itemView
+                        itemView.getLocationOnScreen(itemLocation)
+                        itemLocationX = itemLocation[0]
+                    }
+                    if (!isScrollLeft && itemLocationX > selectorLocationX) {
+                        itemView =
+                            dateRecyclerView.findViewHolderForAdapterPosition(midPos - 1)!!.itemView
+                        itemView.getLocationOnScreen(itemLocation)
+                        itemLocationX = itemLocation[0]
+                    }
                     itemView.post {
                         dateRecyclerView.smoothScrollBy(itemLocationX - selectorLocationX, 0)
                     }
@@ -72,10 +90,6 @@ class DateSelectView : FrameLayout {
                 }
             }
         })
-        dateRecyclerView.post {
-//            dateRecyclerView.scrollBy(3000, 0)
-//            dateRecyclerView.scrollToPosition(28)
-        }
     }
 
     fun setYear(year: Int) {
