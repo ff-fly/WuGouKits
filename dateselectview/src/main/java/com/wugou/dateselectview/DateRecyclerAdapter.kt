@@ -19,14 +19,14 @@ class DateRecyclerAdapter(private val context: Context) :
         private const val ITEM_TYPE_BOTTOM = 2
     }
 
-    private var headerCount: Int
+    var headerCount: Int
     private val dataList = mutableListOf<Int>()
     private var curYear: Int = 0
 
     init {
         val itemSize = dp2px(context, 40f)
         val screenWidth = context.resources.displayMetrics.widthPixels
-        headerCount = (screenWidth / (itemSize * 2)).toInt()
+        headerCount = (screenWidth / (itemSize * 2)).toInt() + 1
         Log.i(TAG, "init headerCount:$headerCount")
     }
 

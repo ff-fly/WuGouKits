@@ -56,27 +56,37 @@ class DateSelectView : FrameLayout {
             override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
                 super.onScrollStateChanged(recyclerView, newState)
                 if (newState == SCROLL_STATE_IDLE) {
+                    val selectorLocationX = selectorView.left
                     firstVisibleItemPos = layoutManager.findFirstVisibleItemPosition()
                     lastVisibleItemPos = layoutManager.findLastVisibleItemPosition()
-                    val selectorLocationX = selectorView.left
                     val midPos = (firstVisibleItemPos + lastVisibleItemPos) / 2
                     var itemView =
                         dateRecyclerView.findViewHolderForAdapterPosition(midPos)!!.itemView
                     val itemLocation = IntArray(2)
                     itemView.getLocationOnScreen(itemLocation)
                     var itemLocationX = itemLocation[0]
+
                     if (isScrollLeft && itemLocationX < selectorLocationX) {
+                        var targetPos = midPos + 1
+                        if (midPos >= dateAdapter.itemCount - dateAdapter.headerCount - 1) {
+                            targetPos = dateAdapter.itemCount - dateAdapter.headerCount - 1
+                        }
                         itemView =
-                            dateRecyclerView.findViewHolderForAdapterPosition(midPos + 1)!!.itemView
+                            dateRecyclerView.findViewHolderForAdapterPosition(targetPos)!!.itemView
                         itemView.getLocationOnScreen(itemLocation)
                         itemLocationX = itemLocation[0]
                     }
                     if (!isScrollLeft && itemLocationX > selectorLocationX) {
+                        var targetPos = midPos - 1
+                        if (midPos <= dateAdapter.headerCount) {
+                            targetPos = dateAdapter.headerCount
+                        }
                         itemView =
-                            dateRecyclerView.findViewHolderForAdapterPosition(midPos - 1)!!.itemView
+                            dateRecyclerView.findViewHolderForAdapterPosition(targetPos)!!.itemView
                         itemView.getLocationOnScreen(itemLocation)
                         itemLocationX = itemLocation[0]
                     }
+
                     itemView.post {
                         dateRecyclerView.smoothScrollBy(itemLocationX - selectorLocationX, 0)
                     }
