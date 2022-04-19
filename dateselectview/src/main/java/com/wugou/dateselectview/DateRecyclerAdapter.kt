@@ -8,16 +8,27 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
-import com.wugou.utils.getDaysOfMonth
+import com.wugou.utils.dp2px
 
 class DateRecyclerAdapter(private val context: Context) :
-    RecyclerView.Adapter<DateRecyclerAdapter.DateViewHolder>() {
+    RecyclerView.Adapter<RecyclerView.ViewHolder>() {
     companion object {
         private const val TAG = "DateRecyclerAdapter"
+        private const val ITEM_TYPE_HEADER = 0
+        private const val ITEM_TYPE_CONTENT = 1
+        private const val ITEM_TYPE_BOTTOM = 2
     }
 
+    private var headerCount: Int
     private val dataList = mutableListOf<Int>()
     private var curYear: Int = 0
+
+    init {
+        val itemSize = dp2px(context, 40f)
+        val screenWidth = context.resources.displayMetrics.widthPixels
+        headerCount = (screenWidth / (itemSize * 2)).toInt()
+        Log.i(TAG, "init headerCount:$headerCount")
+    }
 
     @SuppressLint("NotifyDataSetChanged")
     fun setYear(year: Int) {
@@ -45,20 +56,41 @@ class DateRecyclerAdapter(private val context: Context) :
         setYear(year)
     }
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): DateViewHolder {
-        val itemView =
-            LayoutInflater.from(context).inflate(R.layout.layout_date_item, parent, false)
-        itemView.setBackgroundResource(R.drawable.shape_date_background)
-        return DateViewHolder(itemView)
+    override fun getItemViewType(position: Int): Int {
+        if (position < headerCount) {
+            return ITEM_TYPE_HEADER
+        }
+        if (position >= (headerCount + dataList.size)) {
+            return ITEM_TYPE_BOTTOM
+        }
+
+        return ITEM_TYPE_CONTENT
     }
 
-    override fun onBindViewHolder(holder: DateViewHolder, position: Int) {
-        holder.date.text = dataList[position].toString()
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
+        return if (viewType == ITEM_TYPE_CONTENT) {
+            val itemView =
+                LayoutInflater.from(context).inflate(R.layout.layout_date_item, parent, false)
+            DateViewHolder(itemView)
+        } else {
+            val itemView =
+                LayoutInflater.from(context).inflate(R.layout.layout_date_header, parent, false)
+            HeaderViewHolder(itemView)
+        }
+    }
+
+    override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
+        if (holder is DateViewHolder) {
+            holder.date.text = dataList[position - headerCount].toString()
+            holder.date.setBackgroundResource(R.drawable.shape_date_background)
+        }
     }
 
     override fun getItemCount(): Int {
-        return dataList.size
+        return dataList.size + (2 * headerCount)
     }
+
+    class HeaderViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView)
 
     class DateViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         val date: TextView = itemView.findViewById(R.id.tv_date)
