@@ -11,6 +11,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.SCROLL_STATE_IDLE
 import com.wugou.dateselectview.callback.DateSelectListener
+import java.util.*
 
 class DateSelectView : FrameLayout {
     companion object {
@@ -140,6 +141,23 @@ class DateSelectView : FrameLayout {
         Log.i(TAG, "callbackSelectedDate pos:$targetPos, date:$triple")
         yearTextView.text = triple.first.toString()
         monthTextView.text = triple.second.toString()
+        val calendar = Calendar.getInstance()
+        calendar.set(triple.first, triple.second - 1, triple.third)
+        val dayOfWeek = calendar.get(Calendar.DAY_OF_WEEK)
+        weekDayTextView.text = getDayOfWeek(dayOfWeek)
         dateSelectListener?.onDateSelected(triple.first, triple.second, triple.third)
+    }
+
+    private fun getDayOfWeek(dayOfWeek: Int): String {
+        return when (dayOfWeek) {
+            Calendar.SUNDAY -> "周日"
+            Calendar.MONDAY -> "周一"
+            Calendar.TUESDAY -> "周二"
+            Calendar.WEDNESDAY -> "周三"
+            Calendar.THURSDAY -> "周四"
+            Calendar.FRIDAY -> "周五"
+            Calendar.SATURDAY -> "周六"
+            else -> "ERROR"
+        }
     }
 }
