@@ -62,11 +62,28 @@ class DateSelectView : FrameLayout {
     }
 
     fun setYear(year: Int) {
-        dateAdapter.setYear(year)
+        setDate(year, 12, 30)
     }
 
     fun setDate(year: Int, month: Int, day: Int) {
-        dateAdapter.setDate(year, month, day)
+        val pos = dateAdapter.setDate(year, month, day)
+        dateRecyclerView.post {
+            toPosition(pos)
+        }
+    }
+
+    private fun toPosition(pos: Int) {
+        val targetPos = pos + dateAdapter.headerCount
+        dateRecyclerView.scrollToPosition(targetPos)
+        dateRecyclerView.post {
+            val selectorLocationX = selectorView.left
+            val itemView =
+                dateRecyclerView.findViewHolderForAdapterPosition(targetPos)!!.itemView
+            val itemLocation = IntArray(2)
+            itemView.getLocationOnScreen(itemLocation)
+            val itemLocationX = itemLocation[0]
+            dateRecyclerView.smoothScrollBy(itemLocationX - selectorLocationX, 0)
+        }
     }
 
     private fun adjustItemPosition() {
@@ -102,9 +119,7 @@ class DateSelectView : FrameLayout {
             itemLocationX = itemLocation[0]
         }
 
-        itemView.post {
-            dateRecyclerView.smoothScrollBy(itemLocationX - selectorLocationX, 0)
-        }
+        dateRecyclerView.smoothScrollBy(itemLocationX - selectorLocationX, 0)
         Log.d(
             TAG,
             "onScrollStateChanged, " +

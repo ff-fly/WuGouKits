@@ -9,6 +9,7 @@ import android.view.ViewGroup
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.wugou.utils.dp2px
+import com.wugou.utils.getDaysOfMonth
 
 class DateRecyclerAdapter(private val context: Context) :
     RecyclerView.Adapter<RecyclerView.ViewHolder>() {
@@ -31,29 +32,23 @@ class DateRecyclerAdapter(private val context: Context) :
     }
 
     @SuppressLint("NotifyDataSetChanged")
-    fun setYear(year: Int) {
-        Log.i(TAG, "setYear:$year, curYear:$curYear")
+    fun setDate(year: Int, month: Int, day: Int): Int {
+        Log.i(TAG, "setYear:$year, month:$month, day:$day, curYear:$curYear")
         if (year == curYear) {
-            return
+            return getPositionOfDay(month, day)
         }
 
         curYear = year
         dataList.clear()
-//        for (month in 1..12) {
-//            val days = getDaysOfMonth(year, month)
-//            for (day in 1..days) {
-//                dataList.add(day)
-//            }
-//        }
-        for (month in 0..100) {
-            dataList.add(month)
+        for (m in 1..12) {
+            val days = getDaysOfMonth(year, m)
+            for (d in 1..days) {
+                dataList.add(d)
+            }
         }
         notifyDataSetChanged()
-    }
 
-    fun setDate(year: Int, month: Int, day: Int) {
-        Log.i(TAG, "setYear:$year, month:$month, day:$day, curYear:$curYear")
-        setYear(year)
+        return getPositionOfDay(month, day)
     }
 
     override fun getItemViewType(position: Int): Int {
@@ -88,6 +83,19 @@ class DateRecyclerAdapter(private val context: Context) :
 
     override fun getItemCount(): Int {
         return dataList.size + (2 * headerCount)
+    }
+
+    private fun getPositionOfDay(month: Int, day: Int): Int {
+        var finalDay = day
+        val maxDay = getDaysOfMonth(curYear, month)
+        if (finalDay > maxDay) {
+            finalDay = maxDay
+        }
+        var totalDays = 0
+        for (m in 1 until month) {
+            totalDays += getDaysOfMonth(curYear, m)
+        }
+        return totalDays + finalDay - 1
     }
 
     class HeaderViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView)
