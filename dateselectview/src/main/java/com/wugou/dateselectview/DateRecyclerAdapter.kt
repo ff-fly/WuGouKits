@@ -51,6 +51,19 @@ class DateRecyclerAdapter(private val context: Context) :
         return getPositionOfDay(month, day)
     }
 
+    fun getDateByPos(targetPos: Int): Triple<Int, Int, Int> {
+        var totalDays = 0
+        val targetDate = targetPos + 1
+        for (m in 1..12) {
+            val days = getDaysOfMonth(curYear, m)
+            totalDays += days
+            if (targetDate <= totalDays) {
+                return Triple(curYear, m, days - (totalDays - targetDate))
+            }
+        }
+        return Triple(curYear, 12, 31)
+    }
+
     override fun getItemViewType(position: Int): Int {
         if (position < headerCount) {
             return ITEM_TYPE_HEADER

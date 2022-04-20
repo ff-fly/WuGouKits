@@ -10,6 +10,7 @@ import android.widget.TextView
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.SCROLL_STATE_IDLE
+import com.wugou.dateselectview.callback.DateSelectListener
 
 class DateSelectView : FrameLayout {
     companion object {
@@ -26,6 +27,8 @@ class DateSelectView : FrameLayout {
     private var firstVisibleItemPos = 0
     private var lastVisibleItemPos = 0
     private var isScrollLeft = false
+
+    var dateSelectListener: DateSelectListener? = null
 
     constructor(context: Context) : this(context, null)
     constructor(context: Context, attrs: AttributeSet?) : this(context, attrs, 0)
@@ -62,7 +65,7 @@ class DateSelectView : FrameLayout {
     }
 
     fun setYear(year: Int) {
-        setDate(year, 12, 30)
+        setDate(year, 12, 31)
     }
 
     fun setDate(year: Int, month: Int, day: Int) {
@@ -98,8 +101,9 @@ class DateSelectView : FrameLayout {
         itemView.getLocationOnScreen(itemLocation)
         var itemLocationX = itemLocation[0]
 
+        var targetPos: Int = midPos
         if (isScrollLeft && itemLocationX < selectorLocationX) {
-            var targetPos = midPos + 1
+            targetPos = midPos + 1
             if (midPos >= dateAdapter.itemCount - dateAdapter.headerCount - 1) {
                 targetPos = dateAdapter.itemCount - dateAdapter.headerCount - 1
             }
@@ -109,7 +113,7 @@ class DateSelectView : FrameLayout {
             itemLocationX = itemLocation[0]
         }
         if (!isScrollLeft && itemLocationX > selectorLocationX) {
-            var targetPos = midPos - 1
+            targetPos = midPos - 1
             if (midPos <= dateAdapter.headerCount) {
                 targetPos = dateAdapter.headerCount
             }
@@ -120,6 +124,8 @@ class DateSelectView : FrameLayout {
         }
 
         dateRecyclerView.smoothScrollBy(itemLocationX - selectorLocationX, 0)
+
+        callbackSelectedDate(targetPos - dateAdapter.headerCount)
         Log.d(
             TAG,
             "onScrollStateChanged, " +
@@ -127,5 +133,13 @@ class DateSelectView : FrameLayout {
                     "lastVisibleItemPos:$lastVisibleItemPos, midPos:$midPos, " +
                     "selectorLocationX:$selectorLocationX, itemLocationX:$itemLocationX"
         )
+    }
+
+    private fun callbackSelectedDate(targetPos: Int) {
+        val triple = dateAdapter.getDateByPos(targetPos)
+        Log.i(TAG, "callbackSelectedDate pos:$targetPos, date:$triple")
+        yearTextView.text = triple.first.toString()
+        monthTextView.text = triple.second.toString()
+        dateSelectListener?.onDateSelected(triple.first, triple.second, triple.third)
     }
 }
